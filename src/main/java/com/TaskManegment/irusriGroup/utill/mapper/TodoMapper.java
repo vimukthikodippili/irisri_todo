@@ -3,6 +3,7 @@ package com.TaskManegment.irusriGroup.utill.mapper;
 import com.TaskManegment.irusriGroup.dto.TodoDto;
 import com.TaskManegment.irusriGroup.dto.responsedto.ResponseTodoDto;
 import com.TaskManegment.irusriGroup.entity.Todo;
+import com.TaskManegment.irusriGroup.entity.User;
 import org.mapstruct.Mapper;
 
 import java.util.ArrayList;
@@ -18,6 +19,16 @@ public interface TodoMapper {
         todo.setDueDate(todoDto.getDueDate());
         todo.setPriority(todoDto.getPriority());
         todo.setCompleted(todoDto.isCompleted());
+
+        // Map the user from TodoDto to Todo
+        if (todoDto.getUser() != null) {
+            User user = new User();
+            user.setId(todoDto.getUser().getId());
+            user.setEmail(todoDto.getUser().getEmail());
+            user.setPassword(todoDto.getUser().getPassword());
+            todo.setUser(user);
+        }
+
         return todo;
     }
 

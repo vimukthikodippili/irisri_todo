@@ -34,6 +34,6 @@ public class Todo {
 
     //----------mapping -----//
     @ManyToOne
-    @JoinColumn(name = "todo_user_id", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "todo_user_id", referencedColumnName = "user_id")
     private User user;
 }

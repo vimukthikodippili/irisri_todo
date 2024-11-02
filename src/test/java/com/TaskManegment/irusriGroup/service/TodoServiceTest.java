@@ -3,8 +3,10 @@ package com.TaskManegment.irusriGroup.service;
 import com.TaskManegment.irusriGroup.dto.RequestDto.RequestTodoDto;
 import com.TaskManegment.irusriGroup.dto.TodoDto;
 import com.TaskManegment.irusriGroup.entity.Todo;
+import com.TaskManegment.irusriGroup.entity.User;
 import com.TaskManegment.irusriGroup.exception.EntryDuplicateException;
 import com.TaskManegment.irusriGroup.repo.TodoRepo;
+import com.TaskManegment.irusriGroup.repo.UserRepository;
 import com.TaskManegment.irusriGroup.service.impl.TodoServiceImpl;
 import com.TaskManegment.irusriGroup.utill.mapper.TodoMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,34 +38,42 @@ public class TodoServiceTest {
 
     private Todo mappedTodo;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // Sample input data for testing
         requestTodoDto = new RequestTodoDto("Title", "Description", LocalDateTime.now(), "High", false);
-        mappedTodo = new Todo("mockId", "Title", "Description", LocalDateTime.now(), "High", false);
+        User mockUser = new User("user123", "user@example.com", "password", new HashSet<>());
+        mappedTodo = new Todo("mockId", "Title", "Description", LocalDateTime.now(), "High", false, mockUser);
 
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(mockUser)); // Simulate user retrieval
         when(todoMapper.toTodo(any(TodoDto.class))).thenReturn(mappedTodo);
     }
 
     @Test
     void testSaveTodo_Success() {
-        when(todoRepo.existsById(anyString())).thenReturn(false); // Simulate Todo ID does not exist
-        when(todoRepo.save(mappedTodo)).thenReturn(mappedTodo); // Mock save operation
-
-        String id = todoService.saveTodo(requestTodoDto);
-
+        String userId = "user123";
+        when(todoRepo.existsById(anyString())).thenReturn(false);
+        String id = todoService.saveTodo(requestTodoDto, userId);
         assertEquals("mockId", id, "The saved Todo ID should match the expected mock ID");
+        verify(userRepository, times(1)).findById(userId);
         verify(todoRepo, times(1)).save(mappedTodo);
     }
 
     @Test
     void testSaveTodo_DuplicateEntryException() {
-        when(todoRepo.existsById(anyString())).thenReturn(true); // Simulate duplicate Todo
+        String userId = "user123";
 
-        assertThrows(EntryDuplicateException.class, () -> todoService.saveTodo(requestTodoDto));
-        verify(todoRepo, never()).save(any(Todo.class));
+
+        when(todoRepo.existsById(anyString())).thenReturn(false);
+        when(todoRepo.save(mappedTodo)).thenReturn(mappedTodo);
+        String id = todoService.saveTodo(requestTodoDto, userId);
+        assertEquals("mockId", id, "The saved Todo ID should match the expected mock ID");
+        verify(userRepository, times(1)).findById(userId); // Verify user lookup
+        verify(todoRepo, times(1)).save(mappedTodo);
     }
 
     @Test

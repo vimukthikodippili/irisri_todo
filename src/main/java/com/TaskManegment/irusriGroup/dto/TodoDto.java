@@ -1,10 +1,6 @@
 package com.TaskManegment.irusriGroup.dto;
 
-import com.TaskManegment.irusriGroup.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import lombok.*;
 
 import java.time.LocalDateTime;

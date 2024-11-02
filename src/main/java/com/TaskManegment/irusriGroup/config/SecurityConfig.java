@@ -45,7 +45,7 @@ public class SecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder
-                .userDetailsService(userService) // Ensure userService is correctly implementing UserDetailsService
+                .userDetailsService(userService)
                 .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }

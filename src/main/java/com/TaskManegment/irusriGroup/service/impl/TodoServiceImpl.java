@@ -1,8 +1,6 @@
 package com.TaskManegment.irusriGroup.service.impl;
-
 import com.TaskManegment.irusriGroup.dto.RequestDto.RequestTodoDto;
 import com.TaskManegment.irusriGroup.dto.TodoDto;
-import com.TaskManegment.irusriGroup.dto.UserRegistrationDto;
 import com.TaskManegment.irusriGroup.dto.paginateddto.PaginatedTodoDto;
 import com.TaskManegment.irusriGroup.dto.responsedto.ResponseTodoDto;
 import com.TaskManegment.irusriGroup.entity.Todo;
@@ -53,6 +51,7 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public String saveTodo(RequestTodoDto dto,String userId) {
         Optional<User> user = userRepository.findById(userId);
+        System.out.println("user id "+user.get());
         if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }

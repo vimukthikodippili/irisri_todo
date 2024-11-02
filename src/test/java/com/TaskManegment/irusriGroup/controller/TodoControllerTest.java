@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class TodoControllerTest {
@@ -36,14 +38,18 @@ public class TodoControllerTest {
 
     @Test
     void testSaveTodo() {
-        when(todoService.saveTodo(any(RequestTodoDto.class))).thenReturn("123");
 
-        ResponseEntity<StandardResponse> response = todoController.saveCustomer(requestTodoDto);
+        String userId = "user123";
+        RequestTodoDto requestTodoDto = new RequestTodoDto();
+        when(todoService.saveTodo(any(RequestTodoDto.class), eq(userId))).thenReturn("123");
 
+
+        ResponseEntity<StandardResponse> response = todoController.saveCustomer(userId, requestTodoDto);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("123", response.getBody().getData());
+        assertEquals(" todo added! ", response.getBody().getMessage());
     }
-
     @Test
     void testDeleteTodo() {
         when(todoService.deleteTodo("123")).thenReturn(true);

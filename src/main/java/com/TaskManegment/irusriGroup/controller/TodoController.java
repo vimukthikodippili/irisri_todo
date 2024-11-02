@@ -1,7 +1,6 @@
 package com.TaskManegment.irusriGroup.controller;
 
 import com.TaskManegment.irusriGroup.dto.RequestDto.RequestTodoDto;
-import com.TaskManegment.irusriGroup.dto.TodoDto;
 import com.TaskManegment.irusriGroup.dto.paginateddto.PaginatedTodoDto;
 import com.TaskManegment.irusriGroup.dto.responsedto.ResponseTodoDto;
 import com.TaskManegment.irusriGroup.service.TodoService;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.hibernate.sql.ast.SqlTreeCreationLogger.LOGGER;
+
 
 @RestController
 @RequestMapping("/api/todos")

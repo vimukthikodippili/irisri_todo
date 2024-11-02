@@ -24,7 +24,7 @@ public interface TodoRepo extends JpaRepository<Todo, String> {
     @Query(value = "SELECT * FROM todo WHERE todo_id LIKE %:searchText% OR title LIKE %:searchText% OR description LIKE %:searchText% OR due_date LIKE %:searchText% OR priority LIKE %:searchText% OR completed LIKE %:searchText% ", nativeQuery = true)
     List<Todo> findAllTodoBySearchText(String searchText);
 
-//    List<Todo> getAllBySoring(PageRequest of, String sortBy, String sortDirection);
+
 
     Page<Todo> findAll(Pageable pageable);
 }
