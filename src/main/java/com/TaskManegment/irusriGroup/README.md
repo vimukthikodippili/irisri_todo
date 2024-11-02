@@ -1,34 +1,67 @@
-# Todo Management Application
+Todo Management API
+This is a Spring Boot-based RESTful API for managing Todo tasks. It includes user authentication with JWT, supports user registration and login, and provides CRUD operations for Todo items with advanced filtering and sorting capabilities.
 
-This is a Todo Management application developed using Spring Boot. It allows users to create, update, delete, and manage their todos efficiently. The application provides a RESTful API to interact with the todo items.
+#Table of Contents
+Features
+Tech Stack
+Getting Started
+Endpoints
 
+#Features
 
+User Authentication: Secure user registration and login using JWT.
 
+Todo Management: CRUD operations for todo tasks.
 
-## Features
+Pagination and Sorting: Supports pagination and sorting for large datasets.
 
-- Create new todos
-- Retrieve todos with pagination and sorting
-- Update existing todos
-- Delete todos
-- Search todos by text
-- Update completion status of todos
+Filtering: Allows searching through todos based on various criteria.
 
-## Technologies
+Status Updates: Patch endpoint to update the completion status of a todo.
 
-- Java
-- Spring Boot
-- Spring Data JPA
-- Hibernate
-- mysql
-- Lombok
+#Tech Stack
+Java 17
 
+Spring Boot 3.3.5
 
-## Getting Started
+MySQL (JDBC & JPA)
 
-To run the application locally, follow these steps:
+Spring Security for authentication
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/vimukthikodippili/irisri_todo
-   cd irisri_todo
+JWT (JSON Web Token) for token-based security
+
+Lombok for boilerplate reduction
+
+MapStruct for object mapping
+
+Swagger (OpenAPI) for API documentation
+
+JUnit & Mockito for testing
+
+#Getting Started
+
+Prerequisites
+Java 17
+Maven 3.6+
+MySQL database
+
+#Endpoints
+
+Authentication Endpoints
+POST /api/auth/register: Register a new user
+POST /api/auth/login: Authenticate user and receive JWT token
+
+Todo Endpoints
+POST /api/todos/save?userId={userId}: Create a new todo item
+
+DELETE /api/todos/delete/{todoId}: Delete a todo item by ID
+
+PUT /api/todos/update/{todoId}: Update a todo item by ID
+
+GET /api/todos/all?pageNo={pageNo}&size={size}: Retrieve paginated list of todos
+
+PATCH /api/todos/update/status/{id}?value={value}: Update completion status of a todo
+
+GET /api/todos/search?searchText={text}: Search todos by text
+
+GET /api/todos/sorted?pageNo={pageNo}&size={size}&sortBy={field}&sortDirection={asc/desc}: Retrieve sorted and paginated todos

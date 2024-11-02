@@ -31,4 +31,9 @@ public class Todo {
 
     @Column(name = "completed", columnDefinition = "TINYINT")
     private boolean completed;
+
+    //----------mapping -----//
+    @ManyToOne
+    @JoinColumn(name = "todo_user_id", referencedColumnName = "user_id", nullable = false)
+    private User user;
 }

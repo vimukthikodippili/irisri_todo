@@ -32,11 +32,12 @@ public class TodoController {
      * @param dto the request data for creating a new todo.
      * @return ResponseEntity containing a success message and the created todo ID.
      */
-    @PostMapping(path = "/save")
+    @PostMapping(path = {"/save"}, params = {"userId"})
     public ResponseEntity<StandardResponse> saveCustomer(
+            @RequestParam String userId,
             @RequestBody RequestTodoDto dto) {
         LOGGER.info("Received request to create a todo: {}", dto);
-        String id = todoService.saveTodo(dto);
+        String id = todoService.saveTodo(dto,userId);
         LOGGER.info("Todo created with ID: {}", id);
         return new ResponseEntity<StandardResponse>
                 (new StandardResponse(201," todo added! ", id),
@@ -75,7 +76,6 @@ public class TodoController {
              @RequestBody RequestTodoDto dto,
             @PathVariable String todoId) throws SQLException {
         boolean todo = todoService.updateTodo(dto, todoId);
-        System.out.println(dto + todoId);
         return new ResponseEntity(
                 new StandardResponse(204, "Successfully Updated!!!", todo),
                 HttpStatus.OK

@@ -2,14 +2,18 @@ package com.TaskManegment.irusriGroup.service.impl;
 
 import com.TaskManegment.irusriGroup.dto.RequestDto.RequestTodoDto;
 import com.TaskManegment.irusriGroup.dto.TodoDto;
+import com.TaskManegment.irusriGroup.dto.UserRegistrationDto;
 import com.TaskManegment.irusriGroup.dto.paginateddto.PaginatedTodoDto;
 import com.TaskManegment.irusriGroup.dto.responsedto.ResponseTodoDto;
 import com.TaskManegment.irusriGroup.entity.Todo;
+import com.TaskManegment.irusriGroup.entity.User;
 import com.TaskManegment.irusriGroup.exception.EntryDuplicateException;
 import com.TaskManegment.irusriGroup.exception.EntryNotFoundException;
 import com.TaskManegment.irusriGroup.repo.TodoRepo;
+import com.TaskManegment.irusriGroup.repo.UserRepository;
 import com.TaskManegment.irusriGroup.service.TodoService;
 import com.TaskManegment.irusriGroup.utill.mapper.TodoMapper;
+import com.TaskManegment.irusriGroup.utill.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,12 @@ public class TodoServiceImpl implements TodoService {
     @Autowired
     private TodoMapper todoMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserMapper userMapper;
+
     /**
      * Saves a new todo item in the repository.
      *
@@ -41,7 +51,11 @@ public class TodoServiceImpl implements TodoService {
      * @throws EntryDuplicateException if a todo with the same ID already exists.
      */
     @Override
-    public String saveTodo(RequestTodoDto dto) {
+    public String saveTodo(RequestTodoDto dto,String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
 
         TodoDto todoDto = new TodoDto(
                 "",
@@ -49,7 +63,9 @@ public class TodoServiceImpl implements TodoService {
                 dto.getDescription(),
                 dto.getDueDate(),
                 dto.getPriority(),
-                dto.isCompleted()
+                dto.isCompleted(),
+                userMapper.toUserDto(user.get())
+
         );
         if (!todoRepo.existsById(todoDto.getId())) {
             return todoRepo.save(todoMapper.toTodo(todoDto)).getId();
