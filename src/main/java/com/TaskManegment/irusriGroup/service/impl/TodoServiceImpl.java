@@ -12,6 +12,7 @@ import com.TaskManegment.irusriGroup.repo.UserRepository;
 import com.TaskManegment.irusriGroup.service.TodoService;
 import com.TaskManegment.irusriGroup.utill.mapper.TodoMapper;
 import com.TaskManegment.irusriGroup.utill.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 public class TodoServiceImpl implements TodoService {
     private final Logger LOGGER = LoggerFactory.getLogger(TodoServiceImpl.class);
     @Autowired
@@ -51,7 +53,7 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public String saveTodo(RequestTodoDto dto,String userId) {
         Optional<User> user = userRepository.findById(userId);
-        System.out.println("user id "+user.get());
+        log.info("Attempting to save todo for user ID: {}", userId);
         if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }
@@ -67,8 +69,10 @@ public class TodoServiceImpl implements TodoService {
 
         );
         if (!todoRepo.existsById(todoDto.getId())) {
+            log.info("Todo with ID: {} successfully saved");
             return todoRepo.save(todoMapper.toTodo(todoDto)).getId();
         } else {
+            log.warn("Duplicate entry detected for todo with ID: {}", todoDto.getId());
             throw new EntryDuplicateException("Todo exists");
         }
     }
@@ -82,10 +86,12 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public boolean deleteTodo(String todoId) {
+        log.info("Attempting to delete todo with ID: {}", todoId);
         if (todoRepo.existsById(todoId)) {
             todoRepo.deleteById(todoId);
 
         } else {
+            log.error("Todo with ID: {} not found for deletion", todoId);
             throw new RuntimeException("No todo delete" + todoId);
         }
         return true;
@@ -101,6 +107,7 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public boolean updateTodo(RequestTodoDto dto, String todoId) {
+        log.info("Attempting to update todo with ID: {}", todoId);
         Optional<Todo> todo = todoRepo.findById(todoId);
         if (todo.isPresent()) {
             todo.get().setTitle(dto.getTitle());
@@ -109,8 +116,10 @@ public class TodoServiceImpl implements TodoService {
             todo.get().setPriority(dto.getPriority());
             todo.get().setCompleted(dto.isCompleted());
             todoRepo.save(todo.get());
+            log.info("Todo with ID: {} successfully updated", todoId);
             return true;
         } else {
+            log.error("Todo with ID: {} not found for update", todoId);
             throw new EntryNotFoundException("todo is not available");
         }
     }
@@ -124,8 +133,9 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public PaginatedTodoDto searchTodos(int pageNo, int size) {
+        log.info("Retrieving todos with pagination - page: {}, size: {}", pageNo, size);
         List<Todo> todos = todoRepo.getAllBySearch(PageRequest.of(pageNo, size));
-
+        log.info("Found {} todos");
         return new PaginatedTodoDto(
                 todoMapper.toTodoDTO(todos),
                 todoRepo.countBySearch()
@@ -142,14 +152,15 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public boolean updateCompletedStatus(boolean value, String id) {
+        log.info("Updating completion status of todo with ID: {} to {}", id, value);
         Optional<Todo> updateStatus = todoRepo.findById(id);
         if (updateStatus.isPresent()) {
             updateStatus.get().setCompleted(value);
             todoRepo.save(updateStatus.get());
-            LOGGER.info("Todo with ID: {} marked as {}", id, value ? "completed" : "incomplete");
+            log.info("Todo with ID: {} marked as {}", id, value ? "completed" : "incomplete");
             return true;
         } else {
-            LOGGER.warn("Todo with ID: {} not found", id);
+            log.warn("Todo with ID: {} not found", id);
             throw new EntryNotFoundException("todo is not available");
         }
     }
@@ -162,7 +173,9 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public List<ResponseTodoDto> getTodoBySearchText(String searchText) {
+        log.info("Searching todos by text: {}", searchText);
         List<Todo> todoList = todoRepo.findAllTodoBySearchText(searchText);
+        log.info("Found {} todos matching search text: {}", todoList.size(), searchText);
         return todoMapper.toTodoDTO(todoList);
     }
 
@@ -177,13 +190,14 @@ public class TodoServiceImpl implements TodoService {
      */
     @Override
     public PaginatedTodoDto getTodosWithSorting(int pageNo, int size, String sortBy, String sortDirection) {
-//        List<Todo> todos = todoRepo.getAllBySoring(PageRequest.of(pageNo, size),sortBy,sortDirection);
+        log.info("Retrieving todos with pagination and sorting - page: {}, size: {}, sortBy: {}, sortDirection: {}", pageNo, size, sortBy, sortDirection);
         Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(pageNo, size, Sort.by(direction, sortBy));
 
         Page<Todo> todoPage = todoRepo.findAll(pageable);
         List<Todo> todos = todoPage.getContent();
         long totalElements = todoPage.getTotalElements();
+        log.info("Retrieved {} todos sorted by {} in {} order", todos.size(), sortBy, sortDirection);
         return new PaginatedTodoDto(
                 todoMapper.toTodoDTO(todos),
                 totalElements

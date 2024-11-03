@@ -6,6 +6,7 @@ import com.TaskManegment.irusriGroup.dto.responsedto.ResponseTodoDto;
 import com.TaskManegment.irusriGroup.service.TodoService;
 import com.TaskManegment.irusriGroup.utill.StandardResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,10 @@ import java.util.List;
 @RequestMapping("/api/todos")
 @CrossOrigin
 @RequiredArgsConstructor
+@Slf4j
 public class TodoController {
    private final TodoService todoService;
-   private final Logger LOGGER = LoggerFactory.getLogger(TodoController.class);
+
 
     /**
      * Creates a new todo item.
@@ -35,9 +37,9 @@ public class TodoController {
     public ResponseEntity<StandardResponse> saveCustomer(
             @RequestParam String userId,
             @RequestBody RequestTodoDto dto) {
-        LOGGER.info("Received request to create a todo: {}", dto);
+        log.debug("Received request to create a todo for userId: {}, request data: {}", userId, dto);
         String id = todoService.saveTodo(dto,userId);
-        LOGGER.info("Todo created with ID: {}", id);
+        log.info("Todo created successfully with ID: {}", id);
         return new ResponseEntity<StandardResponse>
                 (new StandardResponse(201," todo added! ", id),
                         HttpStatus.CREATED);
@@ -56,8 +58,9 @@ public class TodoController {
     public ResponseEntity<StandardResponse> deleteTodo(
             @PathVariable String todoId
     ) {
+        log.debug("Received request to delete todo with ID: {}", todoId);
         boolean todo = todoService.deleteTodo(todoId);
-        LOGGER.info(" Deleted:" + todo);
+        log.info("Todo deleted with ID: {}, Status: {}", todoId, todo);
         return new ResponseEntity<StandardResponse>(
                 new StandardResponse(201, "Deleted!", todo),
                 HttpStatus.CREATED);
@@ -74,7 +77,9 @@ public class TodoController {
     public ResponseEntity<StandardResponse> updateTodo(
              @RequestBody RequestTodoDto dto,
             @PathVariable String todoId) throws SQLException {
+        log.debug("Received request to update todo with ID: {}, update data: {}", todoId, dto);
         boolean todo = todoService.updateTodo(dto, todoId);
+        log.info("Todo updated with ID: {}, Update Status: {}", todoId, todo);
         return new ResponseEntity(
                 new StandardResponse(204, "Successfully Updated!!!", todo),
                 HttpStatus.OK
@@ -93,8 +98,9 @@ public class TodoController {
     public ResponseEntity<StandardResponse> searchTodos(
             @RequestParam int pageNo,
             @RequestParam int size) {
+        log.debug("Received request to retrieve all todos with pageNo: {}, size: {}", pageNo, size);
         PaginatedTodoDto paginatedTodoDto = todoService.searchTodos( pageNo, size);
-
+        log.info("Todos retrieved successfully for pageNo: {}, size: {}", pageNo, size);
         return new ResponseEntity<StandardResponse>(
                 new StandardResponse(200, "success", paginatedTodoDto),
                 HttpStatus.OK);
@@ -111,8 +117,9 @@ public class TodoController {
     public ResponseEntity<StandardResponse> updateCompletionStatus(
             @RequestParam(value = "value") boolean value,
             @PathVariable String id) {
+        log.debug("Received request to update completion status for todo ID: {}, new status: {}", id, value);
         boolean updateCompletedStatus = todoService.updateCompletedStatus(value, id);
-        System.out.println(value + id);
+        log.info("Todo completion status updated for ID: {}, Status: {}", id, updateCompletedStatus);
         return new ResponseEntity(
                 new StandardResponse(204, "Successfully Updated!!!", updateCompletedStatus),
                 HttpStatus.OK
@@ -130,7 +137,9 @@ public class TodoController {
             path = {"/search"})
     public ResponseEntity<StandardResponse> getRecordById(
             @RequestParam(value = "searchText") String searchText) {
+        log.debug("Received request to search todos with text: {}", searchText);
         List<ResponseTodoDto> todoDtos = todoService.getTodoBySearchText(searchText);
+        log.info("Search completed for text: {}, Results found: {}", searchText, todoDtos.size());
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success!!!", todoDtos), HttpStatus.OK);
     }
     /**
@@ -148,9 +157,9 @@ public class TodoController {
                                                            @RequestParam(defaultValue = "dueDate") String sortBy,
                                                            @RequestParam(defaultValue = "asc") String sortDirection){
 
-
+        log.debug("Received request to retrieve sorted todos with pageNo: {}, size: {}, sortBy: {}, sortDirection: {}", pageNo, size, sortBy, sortDirection);
         PaginatedTodoDto sortingTodos = todoService.getTodosWithSorting( pageNo, size,sortBy,sortDirection);
-
+        log.info("Sorted todos retrieved successfully with sortBy: {}, sortDirection: {}", sortBy, sortDirection);
         return new ResponseEntity<StandardResponse>(
                 new StandardResponse(200, "success", sortingTodos),
                 HttpStatus.OK);
