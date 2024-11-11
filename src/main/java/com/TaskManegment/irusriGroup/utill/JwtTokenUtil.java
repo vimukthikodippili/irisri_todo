@@ -2,19 +2,17 @@ package com.TaskManegment.irusriGroup.utill;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
+
 
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Component
 public class JwtTokenUtil {
@@ -46,20 +44,6 @@ public class JwtTokenUtil {
                 .signWith(key)  // Only pass the key here
                 .compact();
     }
-
-    private String createToken(Map<String, Object> claims, String subject) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                //.signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
-
     public Claims extractAllClaims(String token) {
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
         return Jwts.parserBuilder()

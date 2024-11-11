@@ -50,7 +50,7 @@ public class AuthController {
      * @return ResponseEntity containing the login status and authentication token.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<StandardResponse> login(@RequestBody LoginRequest loginRequest) {
         log.info("Received login request for email: {}", loginRequest.getEmail());
         try {
             String token = userService.login(loginRequest);
